@@ -20,9 +20,27 @@
     </header>
 
     <!-- Galería -->
+    <!-- Galería con Filtros -->
     <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Botones de Filtro -->
+        <div class="flex flex-wrap justify-center gap-2 mb-8" id="contenedor-filtros">
+            <button onclick="filtrarProyectos('todos')" class="btn-filtro active bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-500">
+                Todos
+            </button>
+            <button onclick="filtrarProyectos('1º Año')" class="btn-filtro bg-slate-800 text-slate-300 border border-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 hover:text-white">
+                1º Año
+            </button>
+            <button onclick="filtrarProyectos('2º Año')" class="btn-filtro bg-slate-800 text-slate-300 border border-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 hover:text-white">
+                2º Año
+            </button>
+            <button onclick="filtrarProyectos('3º Año')" class="btn-filtro bg-slate-800 text-slate-300 border border-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 hover:text-white">
+                3º Año
+            </button>
+        </div>
+
+        <!-- Grid de la Galería -->
         <div id="galeria-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Los proyectos se cargan automáticamente desde proyectos.js -->
+            <!-- Los proyectos se cargan dinámicamente -->
         </div>
     </main>
 
