@@ -1,30 +1,53 @@
-// Base de datos de proyectos del aula
 const misProyectos = [
     {
-        titulo: "Brazo Robótico Hidráulico",
-        fecha: "Mayo 2026",
-        descripcion: "Construcción de un brazo articulado utilizando jeringas y principio de Pascal.",
-        tipoMedia: "imagen", // "imagen" o "video"
+        titulo: "Estructuras y Maquetas",
+        fecha: "Abril 2026",
+        descripcion: "Pruebas de resistencia de puentes hechos con varillas de madera.",
+        tipoMedia: "imagen",
         urlMedia: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600",
-        tags: ["Robótica", "Física", "3º Año"]
+        tags: ["Estructuras", "1º Año"]
     },
     {
-        titulo: "Demostración Impresión 3D",
+        titulo: "Circuitos Eléctricos Básicos",
+        fecha: "Mayo 2026",
+        descripcion: "Construcción de un circuito en serie y paralelo con interruptores caseros.",
+        tipoMedia: "imagen",
+        urlMedia: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=600",
+        tags: ["Electricidad", "2º Año"]
+    },
+    {
+        titulo: "Brazo Robótico Hidráulico",
         fecha: "Junio 2026",
-        descripcion: "Pruebas de calibración e impresión de piezas mecánicas en PLA.",
+        descripcion: "Brazo articulado impulsado por jeringas aplicando el principio de Pascal.",
         tipoMedia: "video",
-        // Poner el link de inserción (embed) de YouTube
-        urlMedia: "https://www.youtube.com/embed/dQw4w9WgXcQ", 
-        tags: ["Diseño 3D", "4º Año"]
+        urlMedia: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        tags: ["Mecánica", "3º Año"]
     }
 ];
 
-// Función para renderizar los proyectos en el HTML
+// Variable global para mantener el filtro seleccionado
+let filtroActual = "todos";
+
+// Función para renderizar los proyectos según el filtro
 function cargarGaleria() {
     const contenedor = document.getElementById("galeria-grid");
     contenedor.innerHTML = "";
 
-    misProyectos.forEach(p => {
+    // Filtrar la lista
+    const proyectosFiltrados = misProyectos.filter(p => {
+        if (filtroActual === "todos") return true;
+        return p.tags.includes(filtroActual);
+    });
+
+    if (proyectosFiltrados.length === 0) {
+        contenedor.innerHTML = `
+            <div class="col-span-full text-center py-12 text-slate-400">
+                <p class="text-lg">No hay proyectos subidos para este año todavía.</p>
+            </div>`;
+        return;
+    }
+
+    proyectosFiltrados.forEach(p => {
         let elementoMedia = "";
 
         if (p.tipoMedia === "imagen") {
@@ -58,6 +81,24 @@ function cargarGaleria() {
 
         contenedor.innerHTML += tarjeta;
     });
+}
+
+// Función que se ejecuta al hacer clic en los botones
+function filtrarProyectos(categoria) {
+    filtroActual = categoria;
+
+    // Actualizar estilos visuales de los botones
+    const botones = document.querySelectorAll(".btn-filtro");
+    botones.forEach(btn => {
+        btn.classList.remove("bg-indigo-600", "text-white");
+        btn.classList.add("bg-slate-800", "text-slate-300");
+    });
+
+    // Destacar el botón activo
+    event.currentTarget.classList.remove("bg-slate-800", "text-slate-300");
+    event.currentTarget.classList.add("bg-indigo-600", "text-white");
+
+    cargarGaleria();
 }
 
 document.addEventListener("DOMContentLoaded", cargarGaleria);
