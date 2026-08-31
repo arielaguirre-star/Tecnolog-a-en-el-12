@@ -3,52 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tecnología - Galería de Proyectos</title>
-    <!-- Tailwind CSS desde CDN para diseño moderno sin configuración -->
+    <title>Educación Tecnológica | Muestra de Trabajos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .neon-glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+        .neon-glow-fuchsia {
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono">
 
-    <!-- Encabezado -->
-    <header class="bg-slate-800 border-b border-slate-700 py-8 px-4 text-center shadow-lg">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-400 tracking-tight">
-            Proyectos de Tecnología
+    <header class="bg-slate-900/80 border-b border-cyan-500/50 py-8 px-4 text-center backdrop-blur-md sticky top-0 z-50">
+        <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-emerald-400 tracking-wider">
+            &lt;EDUCACIÓN TECNOLÓGICA /&gt;
         </h1>
-        <p class="text-slate-400 mt-2 text-sm md:text-base">
-            Muestra de trabajos, prototipos y experiencias del aula de Secundaria
+        <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
+            Galería de Proyectos, Robots y Experiencias del Aula
         </p>
     </header>
 
-    <!-- Galería -->
-    <!-- Galería con Filtros -->
     <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- Botones de Filtro -->
-        <div class="flex flex-wrap justify-center gap-2 mb-8" id="contenedor-filtros">
-            <button onclick="filtrarProyectos('todos')" class="btn-filtro active bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-500">
-                Todos
+        
+        <div class="flex flex-wrap justify-center gap-3 mb-10">
+            <button onclick="filtrar('Todos')" class="btn-f bg-slate-900 text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black px-5 py-2 rounded-full text-xs font-bold transition shadow-lg neon-glow-cyan">
+                TODOS
             </button>
-            <button onclick="filtrarProyectos('1º Año')" class="btn-filtro bg-slate-800 text-slate-300 border border-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 hover:text-white">
-                1º Año
+            <button onclick="filtrar('1º Año')" class="btn-f bg-slate-900 text-slate-300 border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 px-5 py-2 rounded-full text-xs font-bold transition">
+                1º AÑO
             </button>
-            <button onclick="filtrarProyectos('2º Año')" class="btn-filtro bg-slate-800 text-slate-300 border border-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 hover:text-white">
-                2º Año
+            <button onclick="filtrar('2º Año')" class="btn-f bg-slate-900 text-slate-300 border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 px-5 py-2 rounded-full text-xs font-bold transition">
+                2º AÑO
             </button>
-           
         </div>
 
-        <!-- Grid de la Galería -->
-        <div id="galeria-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Los proyectos se cargan dinámicamente -->
+        <div id="galeria-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <p class="col-span-full text-center text-cyan-400 animate-pulse">Cargando datos desde la red...</p>
         </div>
     </main>
 
-    <!-- Pie de página -->
-    <footer class="bg-slate-800 border-t border-slate-700 py-6 text-center text-xs text-slate-500">
-        <p>Escuela Secundaria - Área de Tecnología</p>
-        <p class="mt-1">Alojado en GitHub Pages</p>
+    <footer class="bg-slate-900 border-t border-cyan-500/30 py-6 text-center text-xs text-slate-500">
+        <p>Educación Tecnológica - Escuela Secundaria</p>
     </footer>
 
-    <!-- Carga de datos y lógica -->
-    <script src="proyectos.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ⚠️ REEMPLAZAR CON TU CONFIGURACIÓN DE FIREBASE ⚠️
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROJECT_ID.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT_ID.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let todosLosProyectos = [];
+
+        async function obtenerProyectos() {
+            const contenedor = document.getElementById("galeria-grid");
+            try {
+                const q = query(collection(db, "proyectos_tecno"), orderBy("creadoEn", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                todosLosProyectos = [];
+                querySnapshot.forEach((doc) => {
+                    todosLosProyectos.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderizar(todosLosProyectos);
+            } catch (e) {
+                console.error("Error:", e);
+                contenedor.innerHTML = `<p class="col-span-full text-center text-fuchsia-400">Error al conectar con la base de datos.</p>`;
+            }
+        }
+
+        function renderizar(lista) {
+            const contenedor = document.getElementById("galeria-grid");
+            if (lista.length === 0) {
+                contenedor.innerHTML = `<p class="col-span-full text-center text-slate-500">No hay proyectos subidos para este curso.</p>`;
+                return;
+            }
+
+            contenedor.innerHTML = lista.map(p => {
+                let mediaHTML = "";
+                if (p.tipo === "imagen") {
+                    mediaHTML = `<img src="${p.urlMedia}" alt="${p.titulo}" class="w-full h-52 object-cover">`;
+                } else {
+                    // Extrae el ID del video de YouTube
+                    const videoId = p.urlMedia.split('v=')[1] || p.urlMedia.split('/').pop();
+                    const embedUrl = `https://www.youtube.com/embed/${videoId.split('&')[0]}`;
+                    mediaHTML = `<div class="w-full h-52 bg-black"><iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+                }
+
+                const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
+
+                return `
+                    <article class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-md hover:neon-glow-cyan flex flex-col">
+                        ${mediaHTML}
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h2 class="font-bold text-lg text-slate-100">${p.titulo}</h2>
+                                <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${p.anio}</span>
+                            </div>
+                            <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${p.descripcion}</p>
+                        </div>
+                    </article>
+                `;
+            }).join("");
+        }
+
+        window.filtrar = function(anio) {
+            if (anio === 'Todos') {
+                renderizar(todosLosProyectos);
+            } else {
+                const filtrados = todosLosProyectos.filter(p => p.anio === anio);
+                renderizar(filtrados);
+            }
+        };
+
+        obtenerProyectos();
+    </script>
 </body>
 </html>
