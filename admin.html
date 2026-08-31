@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador | Educación Tecnológica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono p-4">
+
+    <div id="sec-login" class="max-w-md w-full mx-auto my-auto bg-slate-900 border border-cyan-500/40 p-8 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+        <h2 class="text-2xl font-bold text-cyan-400 text-center mb-6">&lt;ACCESO ADMIN/&gt;</h2>
+        <form id="form-login" class="space-y-4">
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">Email Administrador</label>
+                <input type="email" id="login-email" required class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-sm text-cyan-300 focus:border-cyan-400 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">Contraseña</label>
+                <input type="password" id="login-pass" required class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-sm text-cyan-300 focus:border-cyan-400 focus:outline-none">
+            </div>
+            <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded text-sm transition">INGRESAR</button>
+            <p id="msg-login" class="text-xs text-red-400 text-center mt-2"></p>
+        </form>
+    </div>
+
+    <div id="sec-panel" class="hidden max-w-4xl w-full mx-auto py-6">
+        <div class="flex justify-between items-center mb-8 border-b border-cyan-500/30 pb-4">
+            <h1 class="text-xl font-bold text-cyan-400">PANEL DE CONTROL TECNOLÓGICO</h1>
+            <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500 hover:text-white px-4 py-1.5 rounded text-xs">Cerrar Sesión</button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl mb-10 shadow-lg">
+            <h2 class="text-md font-bold text-fuchsia-400 mb-4">+ SUBIR NUEVO MATERIAL</h2>
+            <form id="form-subir" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Título del Proyecto</label>
+                        <input type="text" id="titulo" required class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Curso / Año Escolar</label>
+                        <select id="anio" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
+                            <option value="1º Año">1º Año</option>
+                            <option value="2º Año">2º Año</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Descripción</label>
+                    <textarea id="descripcion" rows="2" required class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Tipo de Archivo</label>
+                        <select id="tipo" onchange="alternarCamposMedia()" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
+                            <option value="imagen">Imagen (Subir archivo)</option>
+                            <option value="video">Video (URL YouTube)</option>
+                        </select>
+                    </div>
+                    <div id="campo-foto">
+                        <label class="block text-xs text-slate-400 mb-1">Foto del Trabajo</label>
+                        <input type="file" id="archivo-foto" accept="image/*" class="w-full text-xs text-slate-400 file:bg-slate-800 file:text-cyan-400 file:border-0 file:py-1.5 file:px-3 file:rounded">
+                    </div>
+                    <div id="campo-video" class="hidden">
+                        <label class="block text-xs text-slate-400 mb-1">Enlace de YouTube</label>
+                        <input type="url" id="url-video" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-publicar" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded text-xs transition">PUBLICAR EN LA WEB</button>
+                <p id="msg-subida" class="text-xs text-center mt-2"></p>
+            </form>
+        </div>
+
+        <h2 class="text-md font-bold text-cyan-400 mb-4">GESTIONAR / BORRAR TRABAJOS</h2>
+        <div id="lista-borrar" class="space-y-3">
+            </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        // ⚠️ REEMPLAZAR CON TU CONFIGURACIÓN DE FIREBASE ⚠️
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROJECT_ID.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT_ID.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Control de Sesión
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById("sec-login").classList.add("hidden");
+                document.getElementById("sec-panel").classList.remove("hidden");
+                cargarListaBorrar();
+            } else {
+                document.getElementById("sec-login").classList.remove("hidden");
+                document.getElementById("sec-panel").classList.add("hidden");
+            }
+        });
+
+        // Iniciar Sesión
+        document.getElementById("form-login").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const pass = document.getElementById("login-pass").value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                document.getElementById("msg-login").innerText = "Credenciales incorrectas.";
+            }
+        });
+
+        window.cerrarSesion = () => signOut(auth);
+
+        window.alternarCamposMedia = () => {
+            const tipo = document.getElementById("tipo").value;
+            document.getElementById("campo-foto").classList.toggle("hidden", tipo !== "imagen");
+            document.getElementById("campo-video").classList.toggle("hidden", tipo !== "video");
+        };
+
+        // Subir Nuevo Proyecto
+        document.getElementById("form-subir").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById("msg-subida");
+            msg.className = "text-xs text-cyan-400 text-center";
+            msg.innerText = "Procesando...";
+
+            try {
+                const titulo = document.getElementById("titulo").value;
+                const anio = document.getElementById("anio").value;
+                const descripcion = document.getElementById("descripcion").value;
+                const tipo = document.getElementById("tipo").value;
+                let urlMedia = "";
+                let storagePath = "";
+
+                if (tipo === "imagen") {
+                    const file = document.getElementById("archivo-foto").files[0];
+                    if (!file) throw new Error("Selecciona una foto.");
+                    storagePath = `tecno_fotos/${Date.now()}_${file.name}`;
+                    const storageRef = ref(storage, storagePath);
+                    await uploadBytes(storageRef, file);
+                    urlMedia = await getDownloadURL(storageRef);
+                } else {
+                    urlMedia = document.getElementById("url-video").value;
+                    if (!urlMedia) throw new Error("Pega la URL de YouTube.");
+                }
+
+                await addDoc(collection(db, "proyectos_tecno"), {
+                    titulo, anio, descripcion, tipo, urlMedia, storagePath,
+                    creadoEn: serverTimestamp()
+                });
+
+                msg.className = "text-xs text-emerald-400 text-center";
+                msg.innerText = "¡Proyecto publicado correctamente!";
+                document.getElementById("form-subir").reset();
+                cargarListaBorrar();
+            } catch (err) {
+                msg.className = "text-xs text-red-400 text-center";
+                msg.innerText = err.message;
+            }
+        });
+
+        // Cargar Lista para Eliminar
+        async function cargarListaBorrar() {
+            const cont = document.getElementById("lista-borrar");
+            const q = query(collection(db, "proyectos_tecno"), orderBy("creadoEn", "desc"));
+            const snapshot = await getDocs(q);
+
+            cont.innerHTML = "";
+            snapshot.forEach((d) => {
+                const item = d.data();
+                cont.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded flex justify-between items-center text-xs">
+                        <div>
+                            <span class="text-cyan-400 font-bold">[${item.anio}]</span> 
+                            <span class="text-slate-200 ml-2 font-bold">${item.titulo}</span>
+                        </div>
+                        <button onclick="borrarProyecto('${d.id}', '${item.storagePath}')" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1 rounded transition">
+                            Eliminar
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Borrar Proyecto
+        window.borrarProyecto = async (id, storagePath) => {
+            if (confirm("¿Estás seguro de eliminar este proyecto de la web?")) {
+                try {
+                    // Si tiene archivo subido en Storage, lo elimina
+                    if (storagePath) {
+                        const fileRef = ref(storage, storagePath);
+                        await deleteObject(fileRef).catch(() => {});
+                    }
+                    await deleteDoc(doc(db, "proyectos_tecno", id));
+                    cargarListaBorrar();
+                } catch (e) {
+                    alert("Error al borrar el elemento.");
+                }
+            }
+        };
+    </script>
+</body>
+</html>
