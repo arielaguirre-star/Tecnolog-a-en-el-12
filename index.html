@@ -11,6 +11,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono">
 
+    <!-- ENCABEZADO -->
     <header class="bg-slate-900/80 border-b border-cyan-500/50 py-8 px-4 text-center backdrop-blur-md sticky top-0 z-40">
         <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-emerald-400 tracking-wider">
             EDUCACIÓN TECNOLÓGICA
@@ -18,9 +19,13 @@
         <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
             Galería de Proyectos, Robots y Experiencias del Aula
         </p>
+         <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
+            Comercial 12
+        </p>
     </header>
 
     <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- BOTONES DE FILTRO -->
         <div class="flex flex-wrap justify-center gap-3 mb-10">
             <button onclick="filtrar('Todos')" class="btn-f bg-slate-900 text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black px-5 py-2 rounded-full text-xs font-bold transition shadow-lg neon-glow-cyan">
                 TODOS
@@ -33,12 +38,13 @@
             </button>
         </div>
 
+        <!-- CONTENEDOR DE LA GALERÍA -->
         <div id="galeria-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <p class="col-span-full text-center text-cyan-400 animate-pulse">Cargando datos desde la red...</p>
         </div>
     </main>
 
-    <!-- VISOR DE ZOOM EN PANTALLA COMPLETA -->
+    <!-- VISOR MODAL PARA AMPLIAR FOTOS -->
     <div id="modal-visor" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex justify-center items-center p-4" onclick="cerrarVisor()">
         <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
             <button onclick="cerrarVisor()" class="absolute -top-10 right-0 text-white hover:text-cyan-400 text-2xl font-bold transition">
@@ -50,7 +56,7 @@
     </div>
 
     <footer class="bg-slate-900 border-t border-cyan-500/30 py-6 text-center text-slate-500 flex justify-center items-center gap-4 text-xs">
-        <p>Educación Tecnológica - Escuela Secundaria</p>
+        <p>Educación Tecnológica - Comercial 12</p>
         <a href="admin.html" class="text-slate-600 hover:text-cyan-400 transition">Panel Admin</a>
     </footer>
 
@@ -82,24 +88,24 @@
             return titulo.replace(/\s*\(\d+\)$/, "");
         }
 
-       function obtenerEmbedYouTube(url) {
-    if (!url) return "";
-    
-    // Si ya viene como link embed, lo devuelve directamente
-    if (url.includes("youtube.com/embed/")) {
-        return url;
-    }
+        // CONVERTIDOR MEJORADO DE URLS DE YOUTUBE (Soporta https://youtu.be/...)
+        function obtenerEmbedYouTube(url) {
+            if (!url) return "";
+            let videoId = "";
 
-    // Expresión regular robusta para capturar el ID de 11 caracteres de YouTube
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
-    const match = url.match(regExp);
+            if (url.includes("youtu.be/")) {
+                videoId = url.split("youtu.be/")[1].split("?")[0].split("&")[0];
+            } else if (url.includes("youtube.com/watch")) {
+                const urlParams = new URLSearchParams(url.split("?")[1]);
+                videoId = urlParams.get("v");
+            } else if (url.includes("youtube.com/embed/")) {
+                return url;
+            } else if (url.includes("youtube.com/shorts/")) {
+                videoId = url.split("shorts/")[1].split("?")[0];
+            }
 
-    if (match && match[2].length === 11) {
-        return `https://www.youtube.com/embed/${match[2]}`;
-    }
-    
-    return url;
-}
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+        }
 
         function renderizar(lista) {
             const contenedor = document.getElementById("galeria-grid");
