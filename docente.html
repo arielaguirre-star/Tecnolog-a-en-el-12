@@ -3,94 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrador | Educación Tecnológica</title>
+    <title>Panel de Administración - Tecnología 12</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono p-4">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
 
-    <!-- Sección Login Admin -->
-    <div id="sec-login" class="max-w-md w-full mx-auto my-auto bg-slate-900 border border-cyan-500/40 p-8 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-        <h2 class="text-2xl font-bold text-cyan-400 text-center mb-6">&lt;ACCESO ADMIN/&gt;</h2>
-        <form id="form-login" class="space-y-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Encabezado del Panel -->
+        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
             <div>
-                <label class="block text-xs text-slate-400 mb-1">Email Administrador</label>
-                <input type="email" id="login-email" required class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-sm text-cyan-300 focus:border-cyan-400 focus:outline-none">
+                <h1 class="text-2xl md:text-3xl font-bold text-cyan-400">Panel de Administración</h1>
+                <p class="text-slate-400 text-sm">Gestión de proyectos - Escuela N° 12</p>
             </div>
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">Contraseña</label>
-                <input type="password" id="login-pass" required class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-sm text-cyan-300 focus:border-cyan-400 focus:outline-none">
-            </div>
-            <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded text-sm transition">INGRESAR</button>
-            <p id="msg-login" class="text-xs text-red-400 text-center mt-2"></p>
-        </form>
-    </div>
+            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-2 rounded border border-cyan-500/30 transition">
+                ← Volver al Sitio
+            </a>
+        </header>
 
-    <!-- Panel de Gestión (Oculto hasta iniciar sesión) -->
-    <div id="sec-panel" class="hidden max-w-4xl w-full mx-auto py-6">
-        <div class="flex justify-between items-center mb-8 border-b border-cyan-500/30 pb-4">
-            <h1 class="text-xl font-bold text-cyan-400">PANEL DE CONTROL TECNOLÓGICO</h1>
-            <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500 hover:text-white px-4 py-1.5 rounded text-xs">Cerrar Sesión</button>
-        </div>
+        <!-- Formulario de Publicación -->
+        <section class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl mb-12">
+            <h2 class="text-xl font-bold mb-4 text-slate-200">Cargar Nuevo Proyecto / Multimedia</h2>
+            
+            <form id="form-proyecto" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Título</label>
+                    <input type="text" id="input-titulo" required class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-slate-100 focus:outline-none focus:border-cyan-500">
+                </div>
 
-        <!-- Formulario de Carga -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl mb-10 shadow-lg">
-            <h2 class="text-md font-bold text-fuchsia-400 mb-4">+ SUBIR NUEVO MATERIAL</h2>
-            <form id="form-subir" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Título del Proyecto</label>
-                        <input type="text" id="titulo" required class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Curso / Año Escolar</label>
-                        <select id="anio" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Año / Curso</label>
+                        <select id="input-anio" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-slate-100 focus:outline-none focus:border-cyan-500">
                             <option value="1º Año">1º Año</option>
                             <option value="2º Año">2º Año</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Tipo de Contenido</label>
+                        <select id="select-tipo" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-slate-100 focus:outline-none focus:border-cyan-500">
+                            <option value="imagen">Imágenes (ImgBB)</option>
+                            <option value="video">Video (YouTube)</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Descripción</label>
-                    <textarea id="descripcion" rows="2" required class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none"></textarea>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Descripción</label>
+                    <textarea id="input-descripcion" rows="3" required class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-slate-100 focus:outline-none focus:border-cyan-500"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Tipo de Archivo</label>
-                        <select id="tipo" onchange="alternarCamposMedia()" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
-                            <option value="imagen">Imagen (Guardar en ImgBB)</option>
-                            <option value="video">Video (URL de YouTube)</option>
-                        </select>
-                    </div>
-                    <div id="campo-foto">
-                        <label class="block text-xs text-slate-400 mb-1">Foto del Trabajo</label>
-                        <input type="file" id="archivo-foto" accept="image/*" class="w-full text-xs text-slate-400 file:bg-slate-800 file:text-cyan-400 file:border-0 file:py-1.5 file:px-3 file:rounded">
-                    </div>
-                    <div id="campo-video" class="hidden">
-                        <label class="block text-xs text-slate-400 mb-1">Enlace de YouTube</label>
-                        <input type="url" id="url-video" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:border-cyan-400 focus:outline-none">
-                    </div>
+                <!-- Campo para Seleccionar Imágenes (Múltiples) -->
+                <div id="campo-imagen">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Seleccionar Imagen(es) — Podes elegir varias</label>
+                    <input type="file" id="input-archivo" accept="image/*" multiple class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500">
                 </div>
 
-                <button type="submit" id="btn-publicar" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded text-xs transition">PUBLICAR EN LA WEB</button>
-                <p id="msg-subida" class="text-xs text-center mt-2"></p>
+                <!-- Campo para URL de Video de YouTube (Oculto por defecto) -->
+                <div id="campo-video" class="hidden">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">URL del Video de YouTube</label>
+                    <input type="url" id="input-url-video" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-slate-100 focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <button type="submit" id="btn-subir" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg transition duration-200">
+                    Publicar Proyecto
+                </button>
             </form>
-        </div>
+        </section>
 
-        <!-- Lista de Proyectos Subidos para Borrar -->
-        <h2 class="text-md font-bold text-cyan-400 mb-4">GESTIONAR / BORRAR TRABAJOS</h2>
-        <div id="lista-borrar" class="space-y-3">
-            <!-- Se cargan dinámicamente -->
-        </div>
+        <!-- Lista de Proyectos Existentes para Eliminar -->
+        <section class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl">
+            <h2 class="text-xl font-bold mb-4 text-slate-200">Proyectos Publicados</h2>
+            <div id="lista-gestion" class="space-y-3">
+                <p class="text-slate-500 text-center py-4">Cargando publicaciones...</p>
+            </div>
+        </section>
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Script de Lógica de Firebase & ImgBB -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         // ⚠️ CLAVE API DE IMGBB ⚠️
         const IMGBB_API_KEY = "ccbc65f4bea21908a11adb119c673316";
 
@@ -104,133 +97,195 @@
             appId: "1:377657972511:web:2dd32d978647a23c2ec22a"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+      const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Control de Sesión Admin
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById("sec-login").classList.add("hidden");
-                document.getElementById("sec-panel").classList.remove("hidden");
-                cargarListaBorrar();
+        // Alternar campos según el tipo seleccionado
+        const selectTipo = document.getElementById("select-tipo");
+        const campoImagen = document.getElementById("campo-imagen");
+        const campoVideo = document.getElementById("campo-video");
+
+        selectTipo.addEventListener("change", () => {
+            if (selectTipo.value === "imagen") {
+                campoImagen.classList.remove("hidden");
+                campoVideo.classList.add("hidden");
             } else {
-                document.getElementById("sec-login").classList.remove("hidden");
-                document.getElementById("sec-panel").classList.add("hidden");
+                campoImagen.classList.add("hidden");
+                campoVideo.classList.remove("hidden");
             }
         });
 
-        // Iniciar Sesión
-        document.getElementById("form-login").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const pass = document.getElementById("login-pass").value;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (err) {
-                document.getElementById("msg-login").innerText = "Credenciales incorrectas.";
-            }
-        });
+        // Función de seguridad XSS (Sanitizar entradas)
+        function sanitizar(texto) {
+            if (!texto) return "";
+            return texto
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-        window.cerrarSesion = () => signOut(auth);
+        // Función auxiliar para extraer ID de YouTube
+        function obtenerEmbedYouTube(url) {
+            if (!url) return "";
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+            const match = url.match(regExp);
 
-        window.alternarCamposMedia = () => {
-            const tipo = document.getElementById("tipo").value;
-            document.getElementById("campo-foto").classList.toggle("hidden", tipo !== "imagen");
-            document.getElementById("campo-video").classList.toggle("hidden", tipo !== "video");
-        };
-
-        // Función para subir la imagen a ImgBB vía API
-        async function subirImagenAImgBB(file) {
-            const formData = new FormData();
-            formData.append("image", file);
-
-            const respuesta = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
-            });
-
-            const datos = await respuesta.json();
-            if (datos.success) {
-                return datos.data.url; // Retorna el link directo de la imagen subida
+            if (match && match[2].length === 11) {
+                return `https://www.youtube.com/embed/${match[2]}`;
             } else {
-                throw new Error("Error al subir la imagen a ImgBB.");
+                return url;
             }
         }
 
-        // Subir Nuevo Proyecto
-        document.getElementById("form-subir").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const msg = document.getElementById("msg-subida");
-            msg.className = "text-xs text-cyan-400 text-center";
-            msg.innerText = "Subiendo archivo y publicando...";
+        // Cargar y mostrar publicaciones para poder borrarlas
+        async function cargarPublicaciones() {
+            const contenedor = document.getElementById("lista-gestion");
+            contenedor.innerHTML = `<p class="text-slate-500 text-center py-4">Cargando...</p>`;
 
             try {
-                const titulo = document.getElementById("titulo").value;
-                const anio = document.getElementById("anio").value;
-                const descripcion = document.getElementById("descripcion").value;
-                const tipo = document.getElementById("tipo").value;
-                let urlMedia = "";
+                const q = query(collection(db, "proyectos_tecno"), orderBy("fechaCreacion", "desc"));
+                const snapshot = await getDocs(q);
 
-                if (tipo === "imagen") {
-                    const file = document.getElementById("archivo-foto").files[0];
-                    if (!file) throw new Error("Selecciona una foto.");
-                    urlMedia = await subirImagenAImgBB(file);
-                } else {
-                    urlMedia = document.getElementById("url-video").value;
-                    if (!urlMedia) throw new Error("Pega la URL de YouTube.");
+                if (snapshot.empty) {
+                    contenedor.innerHTML = `<p class="text-slate-500 text-center py-4">No hay contenido publicado.</p>`;
+                    return;
                 }
 
-                // Guardar la información en la base de datos de Firestore
-                await addDoc(collection(db, "proyectos_tecno"), {
-                    titulo, anio, descripcion, tipo, urlMedia,
-                    creadoEn: serverTimestamp()
-                });
-
-                msg.className = "text-xs text-emerald-400 text-center";
-                msg.innerText = "¡Proyecto publicado correctamente!";
-                document.getElementById("form-subir").reset();
-                cargarListaBorrar();
-            } catch (err) {
-                msg.className = "text-xs text-red-400 text-center";
-                msg.innerText = err.message;
-            }
-        });
-
-        // Cargar Lista para Eliminar
-        async function cargarListaBorrar() {
-            const cont = document.getElementById("lista-borrar");
-            const q = query(collection(db, "proyectos_tecno"), orderBy("creadoEn", "desc"));
-            const snapshot = await getDocs(q);
-
-            cont.innerHTML = "";
-            snapshot.forEach((d) => {
-                const item = d.data();
-                cont.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded flex justify-between items-center text-xs">
-                        <div>
-                            <span class="text-cyan-400 font-bold">[${item.anio}]</span> 
-                            <span class="text-slate-200 ml-2 font-bold">${item.titulo}</span>
+                contenedor.innerHTML = snapshot.docs.map(docSnap => {
+                    const data = docSnap.data();
+                    return `
+                        <div class="flex items-center justify-between bg-slate-800 p-3 rounded border border-slate-700">
+                            <div>
+                                <h3 class="font-bold text-slate-100">${sanitizar(data.titulo)}</h3>
+                                <p class="text-xs text-slate-400">${sanitizar(data.anio)} — ${data.tipo.toUpperCase()}</p>
+                            </div>
+                            <button onclick="eliminarProyecto('${docSnap.id}')" class="bg-red-600/80 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded transition">
+                                Eliminar
+                            </button>
                         </div>
-                        <button onclick="borrarProyecto('${d.id}')" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1 rounded transition">
-                            Eliminar
-                        </button>
-                    </div>
-                `;
-            });
+                    `;
+                }).join("");
+            } catch (error) {
+                console.error("Error al cargar publicaciones:", error);
+                contenedor.innerHTML = `<p class="text-red-400 text-center py-4">Error al obtener las publicaciones.</p>`;
+            }
         }
 
-        // Borrar Proyecto de Firestore
-        window.borrarProyecto = async (id) => {
-            if (confirm("¿Estás seguro de eliminar este proyecto de la galería?")) {
+        // Eliminar publicación de Firestore
+        window.eliminarProyecto = async (id) => {
+            if (confirm("¿Estás seguro de que deseas eliminar este proyecto?")) {
                 try {
                     await deleteDoc(doc(db, "proyectos_tecno", id));
-                    cargarListaBorrar();
-                } catch (e) {
-                    alert("Error al borrar la publicación.");
+                    alert("Proyecto eliminado.");
+                    cargarPublicaciones();
+                } catch (error) {
+                    console.error("Error al eliminar:", error);
+                    alert("No se pudo eliminar el proyecto.");
                 }
             }
         };
+
+        // Evento de Envío del Formulario
+        document.getElementById("form-proyecto").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const titulo = document.getElementById("input-titulo").value.trim();
+            const descripcion = document.getElementById("input-descripcion").value.trim();
+            const anio = document.getElementById("input-anio").value;
+            const tipoMedia = selectTipo.value;
+            const inputArchivo = document.getElementById("input-archivo");
+            const inputUrlVideo = document.getElementById("input-url-video");
+
+            const btnSubir = document.getElementById("btn-subir");
+            btnSubir.disabled = true;
+
+            try {
+                if (tipoMedia === "imagen") {
+                    const archivos = inputArchivo.files;
+
+                    if (archivos.length === 0) {
+                        alert("Por favor seleccioná al menos una imagen.");
+                        btnSubir.disabled = false;
+                        return;
+                    }
+
+                    btnSubir.textContent = `Subiendo 0 de ${archivos.length} imágenes...`;
+
+                    // Bucle para procesar varias fotos seleccionadas a la vez
+                    for (let i = 0; i < archivos.length; i++) {
+                        const archivo = archivos[i];
+                        btnSubir.textContent = `Subiendo foto ${i + 1} de ${archivos.length}...`;
+
+                        const formData = new FormData();
+                        formData.append("image", archivo);
+
+                        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        const data = await res.json();
+
+                        if (!data.success) {
+                            throw new Error(`Error en ImgBB con la imagen ${archivo.name}`);
+                        }
+
+                        const urlImagen = data.data.url;
+                        const tituloFinal = archivos.length > 1 ? `${titulo} (${i + 1})` : titulo;
+
+                        await addDoc(collection(db, "proyectos_tecno"), {
+                            titulo: tituloFinal,
+                            descripcion: descripcion,
+                            anio: anio,
+                            tipo: "imagen",
+                            urlMedia: urlImagen,
+                            fechaCreacion: new Date()
+                        });
+                    }
+
+                    alert(`¡Se publicaron exitosamente las ${archivos.length} imágenes!`);
+
+                } else if (tipoMedia === "video") {
+                    const urlVideoRaw = inputUrlVideo.value.trim();
+                    if (!urlVideoRaw) {
+                        alert("Por favor ingresá la URL del video de YouTube.");
+                        btnSubir.disabled = false;
+                        return;
+                    }
+
+                    btnSubir.textContent = "Guardando video...";
+                    const embedUrl = obtenerEmbedYouTube(urlVideoRaw);
+
+                    await addDoc(collection(db, "proyectos_tecno"), {
+                        titulo: titulo,
+                        descripcion: descripcion,
+                        anio: anio,
+                        tipo: "video",
+                        urlMedia: embedUrl,
+                        fechaCreacion: new Date()
+                    });
+
+                    alert("¡Video publicado exitosamente!");
+                }
+
+                document.getElementById("form-proyecto").reset();
+                selectTipo.dispatchEvent(new Event("change"));
+                cargarPublicaciones();
+
+            } catch (error) {
+                console.error("Error al publicar:", error);
+                alert("Ocurrió un error durante la publicación: " + error.message);
+            } finally {
+                btnSubir.disabled = false;
+                btnSubir.textContent = "Publicar Proyecto";
+            }
+        });
+
+        // Cargar publicaciones al entrar al panel
+        cargarPublicaciones();
     </script>
 </body>
 </html>
+
