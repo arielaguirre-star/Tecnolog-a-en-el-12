@@ -85,41 +85,56 @@
             }
         }
 
-        function renderizar(lista) {
-            const contenedor = document.getElementById("galeria-grid");
-            if (lista.length === 0) {
-                contenedor.innerHTML = `<p class="col-span-full text-center text-slate-500">No hay proyectos subidos para este curso.</p>`;
-                return;
-            }
+       // 1. Esta función convierte CUALQUIER link de YouTube (Shorts, compartidos, etc.) en un link reproducible
+function obtenerEmbedYouTube(url) {
+    if (!url) return "";
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+    const match = url.match(regExp);
 
-            contenedor.innerHTML = lista.map(p => {
-                let mediaHTML = "";
-                if (p.tipo === "imagen") {
-                    mediaHTML = `<img src="${p.urlMedia}" alt="${p.titulo}" class="w-full h-52 object-cover">`;
-                } else {
-                    // Extrae el ID del video de YouTube
-                    const videoId = p.urlMedia.split('v=')[1] || p.urlMedia.split('/').pop();
-                    const embedUrl = `https://www.youtube.com/embed/${videoId.split('&')[0]}`;
-                    mediaHTML = `<div class="w-full h-52 bg-black"><iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
-                }
+    if (match && match[2].length === 11) {
+        return `https://www.youtube.com/embed/${match[2]}`;
+    } else {
+        return url;
+    }
+}
 
-                const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
+// 2. Función que dibuja las tarjetas en la pantalla
+function renderizar(lista) {
+    const contenedor = document.getElementById("galeria-grid");
+    if (lista.length === 0) {
+        contenedor.innerHTML = `<p class="col-span-full text-center text-slate-500">No hay proyectos subidos para este curso.</p>`;
+        return;
+    }
 
-                return `
-                    <article class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-md hover:neon-glow-cyan flex flex-col">
-                        ${mediaHTML}
-                        <div class="p-5 flex flex-col flex-grow">
-                            <div class="flex justify-between items-start mb-2">
-                                <h2 class="font-bold text-lg text-slate-100">${p.titulo}</h2>
-                                <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${p.anio}</span>
-                            </div>
-                            <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${p.descripcion}</p>
-                        </div>
-                    </article>
-                `;
-            }).join("");
+    contenedor.innerHTML = lista.map(p => {
+        let mediaHTML = "";
+        if (p.tipo === "imagen") {
+            mediaHTML = `<img src="${p.urlMedia}" alt="${p.titulo}" class="w-full h-52 object-cover">`;
+        } else {
+            // AQUÍ SE USA LA NUEVA FUNCIÓN DE YOUTUBE:
+            const embedUrl = obtenerEmbedYouTube(p.urlMedia);
+            mediaHTML = `
+                <div class="w-full h-52 bg-black">
+                    <iframe class="w-full h-full" src="${embedUrl}" title="${p.titulo}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>`;
         }
 
+        const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
+
+        return `
+            <article class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-md hover:neon-glow-cyan flex flex-col">
+                ${mediaHTML}
+                <div class="p-5 flex flex-col flex-grow">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="font-bold text-lg text-slate-100">${p.titulo}</h2>
+                        <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${p.anio}</span>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${p.descripcion}</p>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
         window.filtrar = function(anio) {
             if (anio === 'Todos') {
                 renderizar(todosLosProyectos);
