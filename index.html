@@ -9,56 +9,84 @@
         .neon-glow-cyan { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono relative overflow-x-hidden">
 
-    <!-- ENCABEZADO -->
-    <header class="bg-slate-900/80 border-b border-cyan-500/50 py-8 px-4 text-center backdrop-blur-md sticky top-0 z-40">
-        <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-emerald-400 tracking-wider">
-            EDUCACIÓN TECNOLÓGICA
-        </h1>
-        <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
-            Galería de Proyectos, Robots y Experiencias del Aula
-        </p>
-         <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
-            Comercial 12
-        </p>
-    </header>
-
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- BOTONES DE FILTRO -->
-        <div class="flex flex-wrap justify-center gap-3 mb-10">
-            <button onclick="filtrar('Todos')" class="btn-f bg-slate-900 text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black px-5 py-2 rounded-full text-xs font-bold transition shadow-lg neon-glow-cyan">
-                TODOS
-            </button>
-            <button onclick="filtrar('1º Año')" class="btn-f bg-slate-900 text-slate-300 border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 px-5 py-2 rounded-full text-xs font-bold transition">
-                1º AÑO
-            </button>
-            <button onclick="filtrar('2º Año')" class="btn-f bg-slate-900 text-slate-300 border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 px-5 py-2 rounded-full text-xs font-bold transition">
-                2º AÑO
-            </button>
-        </div>
-
-        <!-- CONTENEDOR DE LA GALERÍA -->
-        <div id="galeria-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <p class="col-span-full text-center text-cyan-400 animate-pulse">Cargando datos desde la red...</p>
-        </div>
-    </main>
-
-    <!-- VISOR MODAL PARA AMPLIAR FOTOS -->
-    <div id="modal-visor" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex justify-center items-center p-4" onclick="cerrarVisor()">
-        <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
-            <button onclick="cerrarVisor()" class="absolute -top-10 right-0 text-white hover:text-cyan-400 text-2xl font-bold transition">
-                ✕ Cerrar
-            </button>
-            <img id="imagen-ampliada" src="" alt="Imagen Ampliada" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-slate-700 object-contain">
-            <h3 id="titulo-ampliado" class="mt-4 text-center font-bold text-slate-200 text-lg"></h3>
-        </div>
+    <!-- VIDEO DE FONDO ANIMADO -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <video autoplay loop muted playsinline class="w-full h-full object-cover opacity-20">
+            <!-- Enlace a un video de fondo estilo circuito/tecnología. Puedes cambiar esta URL por el video de fondo que prefieras -->
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-circuit-board-loop-video-31804-large.mp4" type="video/mp4">
+        </video>
+        <!-- Filtro oscuro para garantizar excelente lectura del contenido -->
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]"></div>
     </div>
 
-    <footer class="bg-slate-900 border-t border-cyan-500/30 py-6 text-center text-slate-500 flex justify-center items-center gap-4 text-xs">
-        <p>Educación Tecnológica - Comercial 12</p>
-        <a href="admin.html" class="text-slate-600 hover:text-cyan-400 transition">Panel Admin</a>
-    </footer>
+    <!-- CONTENIDO PRINCIPAL SOBRE EL VIDEO -->
+    <div class="relative z-10 flex flex-col flex-grow">
+
+        <!-- ENCABEZADO -->
+        <header class="bg-slate-900/70 border-b border-cyan-500/40 py-8 px-4 text-center backdrop-blur-md sticky top-0 z-40">
+            <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-emerald-400 tracking-wider">
+                EDUCACIÓN TECNOLÓGICA
+            </h1>
+            <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
+                Galería de Proyectos, Robots y Experiencias del Aula
+            </p>
+        </header>
+
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <!-- BOTONES DE FILTRO -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button onclick="filtrar('Todos')" class="btn-f bg-slate-900/90 text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black px-5 py-2 rounded-full text-xs font-bold transition shadow-lg neon-glow-cyan">
+                    TODOS
+                </button>
+                <button onclick="filtrar('1º Año')" class="btn-f bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 px-5 py-2 rounded-full text-xs font-bold transition">
+                    1º AÑO
+                </button>
+                <button onclick="filtrar('2º Año')" class="btn-f bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 px-5 py-2 rounded-full text-xs font-bold transition">
+                    2º AÑO
+                </button>
+            </div>
+
+            <!-- SECCIÓN 1: VIDEOS -->
+            <section id="seccion-videos" class="mb-14">
+                <div class="flex items-center gap-3 mb-6 border-b border-fuchsia-500/30 pb-3">
+                    <span class="text-2xl">🎬</span>
+                    <h2 class="text-xl md:text-2xl font-bold text-fuchsia-400 tracking-wide uppercase">Videos & Demonstraciones</h2>
+                </div>
+                <div id="grid-videos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <p class="col-span-full text-center text-cyan-400 animate-pulse">Cargando videos...</p>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: IMÁGENES -->
+            <section id="seccion-imagenes">
+                <div class="flex items-center gap-3 mb-6 border-b border-cyan-500/30 pb-3">
+                    <span class="text-2xl">📸</span>
+                    <h2 class="text-xl md:text-2xl font-bold text-cyan-400 tracking-wide uppercase">Galería de Fotos</h2>
+                </div>
+                <div id="grid-imagenes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <p class="col-span-full text-center text-cyan-400 animate-pulse">Cargando fotos...</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- VISOR MODAL PARA AMPLIAR FOTOS -->
+        <div id="modal-visor" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex justify-center items-center p-4" onclick="cerrarVisor()">
+            <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
+                <button onclick="cerrarVisor()" class="absolute -top-10 right-0 text-white hover:text-cyan-400 text-2xl font-bold transition">
+                    ✕ Cerrar
+                </button>
+                <img id="imagen-ampliada" src="" alt="Imagen Ampliada" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-slate-700 object-contain">
+                <h3 id="titulo-ampliado" class="mt-4 text-center font-bold text-slate-200 text-lg"></h3>
+            </div>
+        </div>
+
+        <footer class="bg-slate-900/80 border-t border-cyan-500/30 py-6 text-center text-slate-500 flex justify-center items-center gap-4 text-xs backdrop-blur-md">
+            <p>Educación Tecnológica - Escuela Secundaria</p>
+            <a href="admin.html" class="text-slate-600 hover:text-cyan-400 transition">Panel Admin</a>
+        </footer>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -88,7 +116,6 @@
             return titulo.replace(/\s*\(\d+\)$/, "");
         }
 
-        // CONVERTIDOR MEJORADO DE URLS DE YOUTUBE (Soporta https://youtu.be/...)
         function obtenerEmbedYouTube(url) {
             if (!url) return "";
             let videoId = "";
@@ -107,64 +134,78 @@
             return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
         }
 
-        function renderizar(lista) {
-            const contenedor = document.getElementById("galeria-grid");
-            if (lista.length === 0) {
-                contenedor.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No hay proyectos subidos para este curso.</p>`;
-                return;
+        function renderizarTarjeta(p) {
+            const tituloLimpio = sanitizar(limpiarTitulo(p.titulo));
+            let mediaHTML = "";
+
+            if (p.tipo === "imagen") {
+                mediaHTML = `
+                    <div class="relative group cursor-pointer overflow-hidden" onclick="abrirVisor('${p.urlMedia}', '${tituloLimpio}')">
+                        <img src="${p.urlMedia}" alt="${tituloLimpio}" class="w-full h-52 object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white font-bold text-xs uppercase tracking-wider">
+                            🔍 Ampliar Imagen
+                        </div>
+                    </div>`;
+            } else {
+                const embedUrl = obtenerEmbedYouTube(p.urlMedia);
+                mediaHTML = `
+                    <div class="w-full h-52 bg-black">
+                        <iframe class="w-full h-full" src="${embedUrl}" title="${tituloLimpio}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>`;
             }
 
-            contenedor.innerHTML = lista.map(p => {
-                const tituloLimpio = sanitizar(limpiarTitulo(p.titulo));
-                let mediaHTML = "";
+            const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
 
-                if (p.tipo === "imagen") {
-                    mediaHTML = `
-                        <div class="relative group cursor-pointer overflow-hidden" onclick="abrirVisor('${p.urlMedia}', '${tituloLimpio}')">
-                            <img src="${p.urlMedia}" alt="${tituloLimpio}" class="w-full h-52 object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white font-bold text-xs uppercase tracking-wider">
-                                🔍 Ampliar Imagen
-                            </div>
-                        </div>`;
-                } else {
-                    const embedUrl = obtenerEmbedYouTube(p.urlMedia);
-                    mediaHTML = `
-                        <div class="w-full h-52 bg-black">
-                            <iframe class="w-full h-full" src="${embedUrl}" title="${tituloLimpio}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                        </div>`;
-                }
-
-                const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
-
-                return `
-                    <article class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-md flex flex-col">
-                        ${mediaHTML}
-                        <div class="p-5 flex flex-col flex-grow">
-                            <div class="flex justify-between items-start mb-2">
-                                <h2 class="font-bold text-lg text-slate-100">${tituloLimpio}</h2>
-                                <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${sanitizar(p.anio)}</span>
-                            </div>
-                            <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${sanitizar(p.descripcion)}</p>
+            return `
+                <article class="bg-slate-900/90 backdrop-blur-sm rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-xl flex flex-col">
+                    ${mediaHTML}
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-slate-100">${tituloLimpio}</h3>
+                            <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${sanitizar(p.anio)}</span>
                         </div>
-                    </article>
-                `;
-            }).join("");
+                        <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${sanitizar(p.descripcion)}</p>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderizarListas(lista) {
+            const gridVideos = document.getElementById("grid-videos");
+            const gridImagenes = document.getElementById("grid-imagenes");
+
+            const videos = lista.filter(p => p.tipo === "video");
+            const imagenes = lista.filter(p => p.tipo === "imagen");
+
+            // Renderizado de la sección de Videos
+            if (videos.length === 0) {
+                gridVideos.innerHTML = `<p class="col-span-full text-slate-500 text-sm italic">No hay videos disponibles para este filtro.</p>`;
+            } else {
+                gridVideos.innerHTML = videos.map(p => renderizarTarjeta(p)).join("");
+            }
+
+            // Renderizado de la sección de Imágenes
+            if (imagenes.length === 0) {
+                gridImagenes.innerHTML = `<p class="col-span-full text-slate-500 text-sm italic">No hay imágenes disponibles para este filtro.</p>`;
+            } else {
+                gridImagenes.innerHTML = imagenes.map(p => renderizarTarjeta(p)).join("");
+            }
         }
 
         async function obtenerProyectos() {
-            const contenedor = document.getElementById("galeria-grid");
             try {
                 const q = query(collection(db, "proyectos_tecno"), orderBy("fechaCreacion", "desc"));
                 const querySnapshot = await getDocs(q);
                 todosLosProyectos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderizar(todosLosProyectos);
+                renderizarListas(todosLosProyectos);
             } catch (e) {
                 try {
                     const snapshotSinOrden = await getDocs(collection(db, "proyectos_tecno"));
                     todosLosProyectos = snapshotSinOrden.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderizar(todosLosProyectos);
+                    renderizarListas(todosLosProyectos);
                 } catch (errSecundario) {
-                    contenedor.innerHTML = `<p class="col-span-full text-center text-fuchsia-400 py-8">Error al conectar con la base de datos.</p>`;
+                    document.getElementById("grid-videos").innerHTML = `<p class="col-span-full text-red-400 py-4">Error al conectar con la base de datos.</p>`;
+                    document.getElementById("grid-imagenes").innerHTML = `<p class="col-span-full text-red-400 py-4">Error al conectar con la base de datos.</p>`;
                 }
             }
         }
@@ -181,10 +222,10 @@
 
         window.filtrar = function(anio) {
             if (anio === 'Todos') {
-                renderizar(todosLosProyectos);
+                renderizarListas(todosLosProyectos);
             } else {
                 const filtrados = todosLosProyectos.filter(p => p.anio === anio);
-                renderizar(filtrados);
+                renderizarListas(filtrados);
             }
         };
 
