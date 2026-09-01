@@ -23,6 +23,9 @@
         <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
             Galería de Proyectos, Robots y Experiencias del Aula
         </p>
+        <p class="text-cyan-300 mt-2 text-xs md:text-sm tracking-widest uppercase">
+            Comercial 12
+        </p>
     </header>
 
     <main class="flex-grow container mx-auto px-4 py-8">
@@ -44,14 +47,15 @@
         </div>
     </main>
 
-    <footer class="bg-slate-900 border-t border-cyan-500/30 py-6 text-center text-xs text-slate-500">
-        <p>Educación Tecnológica - Escuela Secundaria</p>
+    <footer class="bg-slate-900 border-t border-cyan-500/30 py-6 text-center text-slate-500 flex justify-center items-center gap-4 text-xs">
+        <p>Educación Tecnológica - Comercial 12 </p>
+        <a href="admin.html" class="text-slate-600 hover:text-cyan-400 transition">Panel Admin</a>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+        
         // ⚠️ REEMPLAZAR CON TU CONFIGURACIÓN DE FIREBASE ⚠️
         const firebaseConfig = {
             apiKey: "AIzaSyAL4AqHuOKmo2YT7VTxwii1zyDS-8YDE98",
@@ -66,86 +70,80 @@
         const db = getFirestore(app);
 
         let todosLosProyectos = [];
-        // 1. FUNCIÓN PARA PREVENIR INYECCIÓN DE CÓDIGO (XSS)
-    function sanitizar(texto) {
-        if (!texto) return "";
-        return texto
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+
+        function sanitizar(texto) {
+            if (!texto) return "";
+            return texto
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function obtenerEmbedYouTube(url) {
+            if (!url) return "";
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : url;
+        }
+
+        function renderizar(lista) {
+            const contenedor = document.getElementById("galeria-grid");
+            if (lista.length === 0) {
+                contenedor.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">No hay proyectos subidos para este curso.</p>`;
+                return;
+            }
+
+            contenedor.innerHTML = lista.map(p => {
+                let mediaHTML = "";
+                if (p.tipo === "imagen") {
+                    mediaHTML = `<img src="${p.urlMedia}" alt="${sanitizar(p.titulo)}" class="w-full h-52 object-cover">`;
+                } else {
+                    const embedUrl = obtenerEmbedYouTube(p.urlMedia);
+                    mediaHTML = `<div class="w-full h-52 bg-black"><iframe class="w-full h-full" src="${embedUrl}" title="${sanitizar(p.titulo)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+                }
+
+                const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
+
+                return `
+                    <article class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-md hover:neon-glow-cyan flex flex-col">
+                        ${mediaHTML}
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h2 class="font-bold text-lg text-slate-100">${sanitizar(p.titulo)}</h2>
+                                <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${sanitizar(p.anio)}</span>
+                            </div>
+                            <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${sanitizar(p.descripcion)}</p>
+                        </div>
+                    </article>
+                `;
+            }).join("");
+        }
 
         async function obtenerProyectos() {
             const contenedor = document.getElementById("galeria-grid");
             try {
-                const q = query(collection(db, "proyectos_tecno"), orderBy("creadoEn", "desc"));
+                // Se corrigió el nombre del campo a fechaCreacion
+                const q = query(collection(db, "proyectos_tecno"), orderBy("fechaCreacion", "desc"));
                 const querySnapshot = await getDocs(q);
                 
-                todosLosProyectos = [];
-                querySnapshot.forEach((doc) => {
-                    todosLosProyectos.push({ id: doc.id, ...doc.data() });
-                });
-
+                todosLosProyectos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderizar(todosLosProyectos);
             } catch (e) {
-                console.error("Error:", e);
-                contenedor.innerHTML = `<p class="col-span-full text-center text-fuchsia-400">Error al conectar con la base de datos.</p>`;
+                console.warn("Fallo con ordenamiento, reintentando consulta simple...", e);
+                // Respaldo sin ordenamiento por si falta crear el índice en Firestore
+                try {
+                    const snapshotSinOrden = await getDocs(collection(db, "proyectos_tecno"));
+                    todosLosProyectos = snapshotSinOrden.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderizar(todosLosProyectos);
+                } catch (errSecundario) {
+                    console.error("Error definitivo:", errSecundario);
+                    contenedor.innerHTML = `<p class="col-span-full text-center text-fuchsia-400 py-8">Error al conectar con la base de datos.</p>`;
+                }
             }
         }
 
-       // 1. Esta función convierte CUALQUIER link de YouTube (Shorts, compartidos, etc.) en un link reproducible
-function obtenerEmbedYouTube(url) {
-    if (!url) return "";
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-
-    if (match && match[2].length === 11) {
-        return `https://www.youtube.com/embed/${match[2]}`;
-    } else {
-        return url;
-    }
-}
-
-// 2. Función que dibuja las tarjetas en la pantalla
-function renderizar(lista) {
-    const contenedor = document.getElementById("galeria-grid");
-    if (lista.length === 0) {
-        contenedor.innerHTML = `<p class="col-span-full text-center text-slate-500">No hay proyectos subidos para este curso.</p>`;
-        return;
-    }
-
-    contenedor.innerHTML = lista.map(p => {
-        let mediaHTML = "";
-        if (p.tipo === "imagen") {
-            // Envoltura en el atributo alt de la imagen:
-            mediaHTML = `<img src="${p.urlMedia}" alt="${sanitizar(p.titulo)}" class="w-full h-52 object-cover">`;
-        } else {
-            const embedUrl = obtenerEmbedYouTube(p.urlMedia);
-            // Envoltura en el title del iframe:
-            mediaHTML = `<div class="w-full h-52 bg-black"><iframe class="w-full h-full" src="${embedUrl}" title="${sanitizar(p.titulo)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-        }
-
-        const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
-
-        return `
-            <article class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition duration-300 shadow-md hover:neon-glow-cyan flex flex-col">
-                ${mediaHTML}
-                <div class="p-5 flex flex-col flex-grow">
-                    <div class="flex justify-between items-start mb-2">
-                        <!-- AQUÍ ESTÁ LA ENVOLTURA DEL TÍTULO: -->
-                        <h2 class="font-bold text-lg text-slate-100">${sanitizar(p.titulo)}</h2>
-                        <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${sanitizar(p.anio)}</span>
-                    </div>
-                    <!-- AQUÍ ESTÁ LA ENVOLTURA DE LA DESCRIPCIÓN: -->
-                    <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${sanitizar(p.descripcion)}</p>
-                </div>
-            </article>
-        `;
-    }).join("");
-}
-}
         window.filtrar = function(anio) {
             if (anio === 'Todos') {
                 renderizar(todosLosProyectos);
