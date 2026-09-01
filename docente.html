@@ -188,100 +188,100 @@
         };
 
         // Evento de Envío del Formulario
-        document.getElementById("form-proyecto").addEventListener("submit", async (e) => {
-            e.preventDefault();
+       // Función auxiliar para hacer una pequeña pausa entre peticiones
+const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-            const titulo = document.getElementById("input-titulo").value.trim();
-            const descripcion = document.getElementById("input-descripcion").value.trim();
-            const anio = document.getElementById("input-anio").value;
-            const tipoMedia = selectTipo.value;
-            const inputArchivo = document.getElementById("input-archivo");
-            const inputUrlVideo = document.getElementById("input-url-video");
+document.getElementById("form-proyecto").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-            const btnSubir = document.getElementById("btn-subir");
-            btnSubir.disabled = true;
+    const titulo = document.getElementById("input-titulo").value.trim();
+    const descripcion = document.getElementById("input-descripcion").value.trim();
+    const anio = document.getElementById("input-anio").value;
+    const tipoMedia = selectTipo.value;
+    const inputArchivo = document.getElementById("input-archivo");
+    const inputUrlVideo = document.getElementById("input-url-video");
 
-            try {
-                if (tipoMedia === "imagen") {
-                    const archivos = inputArchivo.files;
+    const btnSubir = document.getElementById("btn-subir");
+    btnSubir.disabled = true;
 
-                    if (archivos.length === 0) {
-                        alert("Por favor seleccioná al menos una imagen.");
-                        btnSubir.disabled = false;
-                        return;
-                    }
+    try {
+        if (tipoMedia === "imagen") {
+            const archivos = inputArchivo.files;
 
-                    btnSubir.textContent = `Subiendo 0 de ${archivos.length} imágenes...`;
+            if (archivos.length === 0) {
+                alert("Por favor seleccioná al menos una imagen.");
+                btnSubir.disabled = false;
+                return;
+            }
 
-                    // Bucle para procesar varias fotos seleccionadas a la vez
-                    for (let i = 0; i < archivos.length; i++) {
-                        const archivo = archivos[i];
-                        btnSubir.textContent = `Subiendo foto ${i + 1} de ${archivos.length}...`;
+            // IMPORTANTE: Asegurate de poner tu API Key real aquí
+            if (!IMGBB_API_KEY || IMGBB_API_KEY === "TU_IMGBB_API_KEY") {
+                alert("Falta configurar tu clave IMGBB_API_KEY en el código.");
+                btnSubir.disabled = false;
+                return;
+            }
 
-                        const formData = new FormData();
-                        formData.append("image", archivo);
+            let subidasConExito = 0;
 
-                        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                            method: "POST",
-                            body: formData
-                        });
+            for (let i = 0; i < archivos.length; i++) {
+                const archivo = archivos[i];
+                btnSubir.textContent = `Subiendo foto ${i + 1} de ${archivos.length}...`;
 
-                        const data = await res.json();
+                // FormData para enviar la imagen
+                const formData = new FormData();
+                formData.append("image", archivo);
 
-                        if (!data.success) {
-                            throw new Error(`Error en ImgBB con la imagen ${archivo.name}`);
-                        }
+                // Subir a ImgBB
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
 
-                        const urlImagen = data.data.url;
-                        const tituloFinal = archivos.length > 1 ? `${titulo} (${i + 1})` : titulo;
+                const data = await res.json();
 
-                        await addDoc(collection(db, "proyectos_tecno"), {
-                            titulo: tituloFinal,
-                            descripcion: descripcion,
-                            anio: anio,
-                            tipo: "imagen",
-                            urlMedia: urlImagen,
-                            fechaCreacion: new Date()
-                        });
-                    }
-
-                    alert(`¡Se publicaron exitosamente las ${archivos.length} imágenes!`);
-
-                } else if (tipoMedia === "video") {
-                    const urlVideoRaw = inputUrlVideo.value.trim();
-                    if (!urlVideoRaw) {
-                        alert("Por favor ingresá la URL del video de YouTube.");
-                        btnSubir.disabled = false;
-                        return;
-                    }
-
-                    btnSubir.textContent = "Guardando video...";
-                    const embedUrl = obtenerEmbedYouTube(urlVideoRaw);
-
-                    await addDoc(collection(db, "proyectos_tecno"), {
-                        titulo: titulo,
-                        descripcion: descripcion,
-                        anio: anio,
-                        tipo: "video",
-                        urlMedia: embedUrl,
-                        fechaCreacion: new Date()
-                    });
-
-                    alert("¡Video publicado exitosamente!");
+                if (!res.ok || !data.data || !data.data.url) {
+                    console.error(`Error en la imagen ${i + 1}:`, data);
+                    throw new Error(`ImgBB no aceptó la imagen "${archivo.name}". Verifica el tamaño/formato.`);
                 }
 
-                document.getElementById("form-proyecto").reset();
-                selectTipo.dispatchEvent(new Event("change"));
-                cargarPublicaciones();
+                const urlImagen = data.data.url;
+                const tituloFinal = archivos.length > 1 ? `${titulo} (${i + 1})` : titulo;
 
-            } catch (error) {
-                console.error("Error al publicar:", error);
-                alert("Ocurrió un error durante la publicación: " + error.message);
-            } finally {
-                btnSubir.disabled = false;
-                btnSubir.textContent = "Publicar Proyecto";
+                // Guardar en Firestore
+                await addDoc(collection(db, "proyectos_tecno"), {
+                    titulo: tituloFinal,
+                    descripcion: descripcion,
+                    anio: anio,
+                    tipo: "imagen",
+                    urlMedia: urlImagen,
+                    fechaCreacion: new Date()
+                });
+
+                subidasConExito++;
+
+                // Pausa de 500 milisegundos entre subidas para no saturar la API
+                if (i < archivos.length - 1) {
+                    await esperar(500);
+                }
             }
-        });
+
+            alert(`¡Se publicaron exitosamente las ${subidasConExito} imágenes!`);
+
+        } else if (tipoMedia === "video") {
+            // Lógica de video de YouTube...
+        }
+
+        document.getElementById("form-proyecto").reset();
+        cargarPublicaciones();
+
+    } catch (error) {
+        console.error("Error al publicar:", error);
+        alert("Ocurrió un error durante la publicación: " + error.message);
+    } finally {
+        btnSubir.disabled = false;
+        btnSubir.textContent = "Publicar Proyecto";
+    }
+});
 
         // Cargar publicaciones al entrar al panel
         cargarPublicaciones();
