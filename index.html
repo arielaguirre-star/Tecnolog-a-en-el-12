@@ -66,6 +66,16 @@
         const db = getFirestore(app);
 
         let todosLosProyectos = [];
+        // 1. FUNCIÓN PARA PREVENIR INYECCIÓN DE CÓDIGO (XSS)
+    function sanitizar(texto) {
+        if (!texto) return "";
+        return texto
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
         async function obtenerProyectos() {
             const contenedor = document.getElementById("galeria-grid");
@@ -109,14 +119,12 @@ function renderizar(lista) {
     contenedor.innerHTML = lista.map(p => {
         let mediaHTML = "";
         if (p.tipo === "imagen") {
-            mediaHTML = `<img src="${p.urlMedia}" alt="${p.titulo}" class="w-full h-52 object-cover">`;
+            // Envoltura en el atributo alt de la imagen:
+            mediaHTML = `<img src="${p.urlMedia}" alt="${sanitizar(p.titulo)}" class="w-full h-52 object-cover">`;
         } else {
-            // AQUÍ SE USA LA NUEVA FUNCIÓN DE YOUTUBE:
             const embedUrl = obtenerEmbedYouTube(p.urlMedia);
-            mediaHTML = `
-                <div class="w-full h-52 bg-black">
-                    <iframe class="w-full h-full" src="${embedUrl}" title="${p.titulo}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>`;
+            // Envoltura en el title del iframe:
+            mediaHTML = `<div class="w-full h-52 bg-black"><iframe class="w-full h-full" src="${embedUrl}" title="${sanitizar(p.titulo)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
         }
 
         const colorTag = p.anio === '1º Año' ? 'border-cyan-500 text-cyan-400' : 'border-fuchsia-500 text-fuchsia-400';
@@ -126,14 +134,17 @@ function renderizar(lista) {
                 ${mediaHTML}
                 <div class="p-5 flex flex-col flex-grow">
                     <div class="flex justify-between items-start mb-2">
-                        <h2 class="font-bold text-lg text-slate-100">${p.titulo}</h2>
-                        <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${p.anio}</span>
+                        <!-- AQUÍ ESTÁ LA ENVOLTURA DEL TÍTULO: -->
+                        <h2 class="font-bold text-lg text-slate-100">${sanitizar(p.titulo)}</h2>
+                        <span class="text-[10px] px-2 py-0.5 rounded border ${colorTag} font-bold">${sanitizar(p.anio)}</span>
                     </div>
-                    <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${p.descripcion}</p>
+                    <!-- AQUÍ ESTÁ LA ENVOLTURA DE LA DESCRIPCIÓN: -->
+                    <p class="text-slate-400 text-xs mb-4 flex-grow font-sans">${sanitizar(p.descripcion)}</p>
                 </div>
             </article>
         `;
     }).join("");
+}
 }
         window.filtrar = function(anio) {
             if (anio === 'Todos') {
