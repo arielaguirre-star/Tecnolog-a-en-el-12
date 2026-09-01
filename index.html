@@ -46,7 +46,18 @@
             <p class="col-span-full text-center text-cyan-400 animate-pulse">Cargando datos desde la red...</p>
         </div>
     </main>
-
+    
+    <!-- MODAL / VISOR PARA AMPLIAR FOTOS -->
+    <div id="modal-visor" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex justify-center items-center p-4" onclick="cerrarVisor()">
+        <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="cerrarVisor()" class="absolute -top-10 right-0 text-white hover:text-cyan-400 text-2xl font-bold transition">
+                ✕ Cerrar
+            </button>
+            <img id="imagen-ampliada" src="" alt="Imagen Ampliada" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-slate-700 object-contain">
+            <h3 id="titulo-ampliado" class="mt-4 text-center font-bold text-slate-200 text-lg"></h3>
+        </div>
+    </div>
+    
     <footer class="bg-slate-900 border-t border-cyan-500/30 py-6 text-center text-slate-500 flex justify-center items-center gap-4 text-xs">
         <p>Educación Tecnológica - Comercial 12 </p>
       <!--  <a href="admin.html" class="text-slate-600 hover:text-cyan-400 transition">Panel Admin</a> -->
@@ -81,6 +92,11 @@
                 .replace(/'/g, "&#039;");
         }
 
+        // Remueve la numeración (1), (2) al mostrar el título en el sitio público
+        function limpiarTitulo(titulo) {
+            if (!titulo) return "";
+            return titulo.replace(/\s*\(\d+\)$/, "");
+        }
         function obtenerEmbedYouTube(url) {
             if (!url) return "";
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
@@ -144,6 +160,16 @@
             }
         }
 
+        // --- FUNCIONES DEL MODAL DE IMAGEN ---
+        window.abrirVisor = function(url, titulo) {
+            document.getElementById("imagen-ampliada").src = url;
+            document.getElementById("titulo-ampliado").textContent = titulo;
+            document.getElementById("modal-visor").classList.remove("hidden");
+        };
+
+        window.cerrarVisor = function() {
+            document.getElementById("modal-visor").classList.add("hidden");
+        };
         window.filtrar = function(anio) {
             if (anio === 'Todos') {
                 renderizar(todosLosProyectos);
