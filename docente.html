@@ -8,7 +8,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
 
-    <!-- 1. FORMULARIO DE LOGIN (Para autenticarte contra las reglas de Firestore) -->
+    <!-- 1. FORMULARIO DE LOGIN -->
     <div id="seccion-login" class="max-w-md mx-auto my-12 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl">
         <h2 class="text-2xl font-bold text-center text-cyan-400 mb-6">Iniciar Sesión Admin</h2>
         <form id="form-login" class="space-y-4">
@@ -27,7 +27,7 @@
         </form>
     </div>
 
-    <!-- 2. PANEL DE CARGA (Se muestra únicamente al iniciar sesión) -->
+    <!-- 2. PANEL DE CARGA -->
     <div id="seccion-panel" class="max-w-4xl mx-auto hidden">
         <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
             <div>
@@ -92,23 +92,22 @@
             </form>
         </section>
 
+        <!-- LISTA CON VISTA PREVIA DE IMÁGENES -->
         <section class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl">
             <h2 class="text-xl font-bold mb-4 text-slate-200">Proyectos Publicados</h2>
-            <div id="lista-gestion" class="space-y-3">
-                <p class="text-slate-500 text-center py-4">Cargando publicaciones...</p>
+            <div id="lista-gestion" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="col-span-full text-slate-500 text-center py-4">Cargando publicaciones...</p>
             </div>
         </section>
     </div>
 
-    <!-- LÓGICA REORDENADA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        // ⚠️ CLAVE API DE IMGBB ⚠️
+
         const IMGBB_API_KEY = "ccbc65f4bea21908a11adb119c673316";
 
-        // ⚠️ CONFIGURACIÓN DE FIREBASE ⚠️
         const firebaseConfig = {
             apiKey: "AIzaSyAL4AqHuOKmo2YT7VTxwii1zyDS-8YDE98",
             authDomain: "tecno-del-12.firebaseapp.com",
@@ -118,7 +117,7 @@
             appId: "1:377657972511:web:2dd32d978647a23c2ec22a"
         };
 
-     const app = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
@@ -126,7 +125,6 @@
         const seccionPanel = document.getElementById("seccion-panel");
         const userEmailSpan = document.getElementById("user-email");
 
-        // --- CONTROL DE SESIÓN ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 seccionLogin.classList.add("hidden");
@@ -153,7 +151,6 @@
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                console.error("Error al iniciar sesión:", error);
                 errorMsg.textContent = "Credenciales inválidas. Verifica tu contraseña.";
                 errorMsg.classList.remove("hidden");
             } finally {
@@ -164,7 +161,6 @@
 
         document.getElementById("btn-logout").addEventListener("click", () => signOut(auth));
 
-        // --- CAMBIO DE VISTA MEDIA ---
         const selectTipo = document.getElementById("select-tipo");
         const campoImagen = document.getElementById("campo-imagen");
         const campoVideo = document.getElementById("campo-video");
@@ -193,7 +189,6 @@
 
         const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // --- SUBIDA DE PROYECTOS ---
         document.getElementById("form-proyecto").addEventListener("submit", async (e) => {
             e.preventDefault();
 
@@ -291,29 +286,46 @@
             }
         });
 
-        // --- CARGA DE PUBLICACIONES Y ELIMINACIÓN ---
+        // --- CARGA DE PUBLICACIONES CON TARJETAS Y VISTA PREVIA ---
         async function cargarPublicaciones() {
             const contenedor = document.getElementById("lista-gestion");
-            contenedor.innerHTML = `<p class="text-slate-500 text-center py-4">Cargando...</p>`;
+            contenedor.innerHTML = `<p class="col-span-full text-slate-500 text-center py-4">Cargando...</p>`;
 
             try {
-                const q = query(collection(db, "proyectos_tecno"), orderBy("fechaCreacion", "desc"));
-                const snapshot = await getDocs(q);
+                let snapshot;
+                try {
+                    const q = query(collection(db, "proyectos_tecno"), orderBy("fechaCreacion", "desc"));
+                    snapshot = await getDocs(q);
+                } catch (e) {
+                    snapshot = await getDocs(collection(db, "proyectos_tecno"));
+                }
 
                 if (snapshot.empty) {
-                    contenedor.innerHTML = `<p class="text-slate-500 text-center py-4">No hay contenido publicado.</p>`;
+                    contenedor.innerHTML = `<p class="col-span-full text-slate-500 text-center py-4">No hay contenido publicado.</p>`;
                     return;
                 }
 
                 contenedor.innerHTML = snapshot.docs.map(docSnap => {
                     const data = docSnap.data();
+                    let miniatura = "";
+
+                    if (data.tipo === "imagen") {
+                        miniatura = `<img src="${data.urlMedia}" alt="${sanitizar(data.titulo)}" class="w-20 h-20 object-cover rounded border border-slate-700 flex-shrink-0">`;
+                    } else {
+                        miniatura = `
+                            <div class="w-20 h-20 bg-slate-950 rounded border border-slate-700 flex items-center justify-center flex-shrink-0 text-red-500">
+                                ▶ Video
+                            </div>`;
+                    }
+
                     return `
-                        <div class="flex items-center justify-between bg-slate-800 p-3 rounded border border-slate-700">
-                            <div>
-                                <h3 class="font-bold text-slate-100">${sanitizar(data.titulo)}</h3>
+                        <div class="flex items-center gap-3 bg-slate-800 p-3 rounded-lg border border-slate-700 shadow">
+                            ${miniatura}
+                            <div class="flex-grow min-w-0">
+                                <h3 class="font-bold text-slate-100 text-sm truncate">${sanitizar(data.titulo)}</h3>
                                 <p class="text-xs text-slate-400">${sanitizar(data.anio)} — ${data.tipo.toUpperCase()}</p>
                             </div>
-                            <button onclick="eliminarProyecto('${docSnap.id}')" class="bg-red-600/80 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded transition">
+                            <button onclick="eliminarProyecto('${docSnap.id}')" class="bg-red-600/80 hover:bg-red-500 text-white text-xs px-3 py-2 rounded transition flex-shrink-0">
                                 Eliminar
                             </button>
                         </div>
@@ -321,7 +333,7 @@
                 }).join("");
             } catch (error) {
                 console.error("Error al cargar publicaciones:", error);
-                contenedor.innerHTML = `<p class="text-red-400 text-center py-4">Error al obtener las publicaciones.</p>`;
+                contenedor.innerHTML = `<p class="col-span-full text-red-400 text-center py-4">Error al obtener las publicaciones.</p>`;
             }
         }
 
